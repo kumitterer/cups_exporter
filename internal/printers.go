@@ -12,20 +12,20 @@ func (e *Exporter) printerMetrics(ch chan<- prometheus.Metric) error {
 		return err
 	}
 
-	states := map[int8]int{
-		ipp.PrinterStateIdle:       0,
-		ipp.PrinterStateProcessing: 0,
-		ipp.PrinterStateStopped:    0,
+	states := map[int]int{
+		int(ipp.PrinterStateIdle):       0,
+		int(ipp.PrinterStateProcessing): 0,
+		int(ipp.PrinterStateStopped):    0,
 	}
 
 	for _, attr := range printers {
-		states[attr["printer-state"][0].Value.(int8)]++
+		states[attr["printer-state"][0].Value.(int)]++
 	}
 
 	ch <- prometheus.MustNewConstMetric(e.printersTotal, prometheus.GaugeValue, float64(len(printers)))
-	ch <- prometheus.MustNewConstMetric(e.printerStateTotal, prometheus.GaugeValue, float64(states[ipp.PrinterStateIdle]), "idle")
-	ch <- prometheus.MustNewConstMetric(e.printerStateTotal, prometheus.GaugeValue, float64(states[ipp.PrinterStateProcessing]), "processing")
-	ch <- prometheus.MustNewConstMetric(e.printerStateTotal, prometheus.GaugeValue, float64(states[ipp.PrinterStateStopped]), "stopped")
+	ch <- prometheus.MustNewConstMetric(e.printerStateTotal, prometheus.GaugeValue, float64(states[int(ipp.PrinterStateIdle)]), "idle")
+	ch <- prometheus.MustNewConstMetric(e.printerStateTotal, prometheus.GaugeValue, float64(states[int(ipp.PrinterStateProcessing)]), "processing")
+	ch <- prometheus.MustNewConstMetric(e.printerStateTotal, prometheus.GaugeValue, float64(states[int(ipp.PrinterStateStopped)]), "stopped")
 
 	return nil
 }
